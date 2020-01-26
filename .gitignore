@@ -1,0 +1,12 @@
+.DS_Store
+*.o
+*.exe
+*.log
+*.dump
+*.nes
+.vscode
+superdendy
+build
+tests
+removed
+research
