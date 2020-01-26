@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
 	Audio audio(logger, config);
 	Input input(logger, config, "gamecontrollerdb.txt");
 
-	auto emulator = Emulator::from_file(logger, config, graphics, audio, input, argv[1]);
+	auto emulator = get_emulator_for_file(logger, config, graphics, audio, input, argv[1]);
 
 	if (emulator == nullptr) {
 		logger.fatal("No emulator available to load file");
@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
 
 	graphics.create_window(emulator->get_dimensions());
 
-	SDL_Thread* system_thread = SDL_CreateThread((SDL_ThreadFunction)Emulator::callback, "system", emulator.get());
+	SDL_Thread* system_thread = SDL_CreateThread((SDL_ThreadFunction)emulate_callback, "system", emulator.get());
 	if (system_thread == NULL) {
 		logger.fatal(SDL_GetError());
 		return 1;

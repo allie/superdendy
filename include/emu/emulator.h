@@ -10,10 +10,9 @@
 #include <memory>
 
 namespace SuperDendy::Emu {
-	class Emulator {
+	class IEmulator {
 	public:
-		Emulator() {};
-		virtual ~Emulator() {};
+		virtual ~IEmulator() {};
 
 		virtual void load_file(const char* file) = 0;
 		virtual Dim get_dimensions() = 0;
@@ -21,15 +20,16 @@ namespace SuperDendy::Emu {
 		virtual void reset() = 0;
 		virtual void emulate() = 0;
 		virtual void render() = 0;
-
-		static std::unique_ptr<Emulator> from_file(
-			SuperDendy::Core::Logger& logger,
-			SuperDendy::Core::Config& config,
-			SuperDendy::Core::Graphics& graphics,
-			SuperDendy::Core::Audio& audio,
-			SuperDendy::Core::Input& input,
-			const char* file
-		);
-		static void callback(void* data);
 	};
+
+	std::unique_ptr<IEmulator> get_emulator_for_file(
+		SuperDendy::Core::Logger& logger,
+		SuperDendy::Core::Config& config,
+		SuperDendy::Core::Graphics& graphics,
+		SuperDendy::Core::Audio& audio,
+		SuperDendy::Core::Input& input,
+		const char* file
+	);
+
+	void emulate_callback(void* data);
 }

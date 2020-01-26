@@ -2,8 +2,14 @@
 
 using namespace SuperDendy::Core;
 
-Input::Input(Logger& logger, Config& config, const std::string& db_path)
-	: logger(logger), config(config) {
+Input::Input(
+	Logger& logger,
+	Config& config,
+	const std::string& db_path
+) :
+	logger(logger),
+	config(config)
+{
 }
 
 Input::~Input() {

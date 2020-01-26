@@ -5,7 +5,7 @@ using namespace SuperDendy;
 using namespace SuperDendy::Core;
 using namespace SuperDendy::Emu::Famicom;
 
-FamicomEmulator::FamicomEmulator(
+Emulator::Emulator(
 	SuperDendy::Core::Logger& logger,
 	SuperDendy::Core::Config& config,
 	SuperDendy::Core::Graphics& graphics,
@@ -13,43 +13,52 @@ FamicomEmulator::FamicomEmulator(
 	SuperDendy::Core::Input& input,
 	const char* file
 ) :
-	Emulator(),
 	logger(logger),
 	config(config),
 	graphics(graphics),
 	audio(audio),
 	input(input),
-	cart(logger, file) {
+	cart(logger, file),
+	cpu_bus(logger),
+	cpu(logger, cpu_bus, interrupt_line, MOS6502::Mode::NES)
+{
 	logger.info("Famicom emulator initialized");
 }
 
-FamicomEmulator::~FamicomEmulator() {
+Emulator::~Emulator() {
 }
 
-void FamicomEmulator::load_file(const char* file) {
+void Emulator::load_file(const char* file) {
 	logger.info("Loaded file " + (std::string)file);
 }
 
-Dim FamicomEmulator::get_dimensions() {
+Dim Emulator::get_dimensions() {
 	return {
 		256,
 		240
 	};
 }
 
-void FamicomEmulator::power_on() {
+void Emulator::power_on() {
 	logger.info("Famicom powered on");
 }
 
-void FamicomEmulator::reset() {
+void Emulator::reset() {
 	logger.info("Famicom reset");
 }
 
-void FamicomEmulator::emulate() {
-	logger.info("Testing emulate()");
+Dword Emulator::step() {
+	Dword cycles = cpu.step();
+	return cycles;
 }
 
-void FamicomEmulator::render() {
+void Emulator::emulate() {
+	while (2) {
+		step();
+	}
+}
+
+void Emulator::render() {
 	graphics.clear();
 	graphics.render_string(cart.name, 0, 0);
 	graphics.present();

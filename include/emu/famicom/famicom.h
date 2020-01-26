@@ -3,19 +3,28 @@
 #include "common.h"
 #include "emu/emulator.h"
 #include "emu/famicom/cart.h"
+#include "emu/famicom/cpu_bus.h"
+#include "emu/mos6502/cpu.h"
+#include "emu/mos6502/interrupt.h"
 
 namespace SuperDendy::Emu::Famicom {
-	class FamicomEmulator : public Emulator {
+	class Emulator : public IEmulator {
 	private:
 		SuperDendy::Core::Logger& logger;
 		SuperDendy::Core::Config& config;
 		SuperDendy::Core::Graphics& graphics;
 		SuperDendy::Core::Audio& audio;
 		SuperDendy::Core::Input& input;
+
 		Cart cart;
+		CPUBus cpu_bus;
+		MOS6502::CPU cpu;
+		MOS6502::InterruptLine interrupt_line;
+
+		Dword step();
 
 	public:
-		FamicomEmulator(
+		Emulator(
 			SuperDendy::Core::Logger& logger,
 			SuperDendy::Core::Config& config,
 			SuperDendy::Core::Graphics& graphics,
@@ -23,7 +32,7 @@ namespace SuperDendy::Emu::Famicom {
 			SuperDendy::Core::Input& input,
 			const char* file
 		);
-		~FamicomEmulator();
+		~Emulator();
 
 		void load_file(const char* file) override;
 		Dim get_dimensions() override;

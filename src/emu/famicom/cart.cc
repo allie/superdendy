@@ -6,8 +6,12 @@ using namespace SuperDendy::Core;
 using namespace SuperDendy::Emu::Famicom;
 
 // Construct a Cart with rom.buffer loaded from a .nes file
-Cart::Cart(SuperDendy::Core::Logger& logger, const char* file)
-	: logger(logger) {
+Cart::Cart(
+	SuperDendy::Core::Logger& logger,
+	const char* file
+) :
+	logger(logger)
+{
 	BinaryFile rom(logger, file);
 	// std::cout << file << std::endl;
 	logger.debug("Read ROM file to memory");

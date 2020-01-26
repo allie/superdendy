@@ -7,8 +7,13 @@
 
 using namespace SuperDendy::Core;
 
-Config::Config(Logger& logger, const std::string& file)
-	: logger(logger), file(file) {
+Config::Config(
+	Logger& logger,
+	const std::string& file
+) :
+	logger(logger),
+	file(file)
+{
 	std::ifstream ifs(file);
 
 	if (ifs.good()) {

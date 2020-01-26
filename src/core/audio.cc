@@ -5,8 +5,15 @@
 
 using namespace SuperDendy::Core;
 
-Audio::Audio(Logger& logger, Config& config)
-	: logger(logger), config(config), current(0), sample_size(1024) {
+Audio::Audio(
+	Logger& logger,
+	Config& config
+) :
+	logger(logger),
+	config(config),
+	current(0),
+	sample_size(1024)
+{
 }
 
 Audio::~Audio() {

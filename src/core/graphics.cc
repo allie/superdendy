@@ -3,8 +3,13 @@
 
 using namespace SuperDendy::Core;
 
-Graphics::Graphics(Logger& logger, Config& config)
-	: logger(logger), config(config) {
+Graphics::Graphics(
+	Logger& logger,
+	Config& config
+) :
+	logger(logger),
+	config(config)
+{
 }
 
 Graphics::~Graphics() {

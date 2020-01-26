@@ -5,8 +5,12 @@
 using namespace SuperDendy;
 using namespace SuperDendy::Core;
 
-BinaryFile::BinaryFile(Logger& logger, const char* file)
-	: logger(logger) {
+BinaryFile::BinaryFile(
+	Logger& logger,
+	const char* file
+) :
+	logger(logger)
+{
 	std::ifstream ifs(file, std::ios::binary | std::ios::ate);
 
 	if (ifs.good()) {

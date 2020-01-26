@@ -1,6 +1,6 @@
-#include "emu/famicom/interrupt_line.h"
-
-using namespace SuperDendy::Emu::Famicom;
+#include "emu/mos6502/interrupt.h"
+#include <iostream>
+using namespace SuperDendy::Emu::MOS6502;
 
 InterruptLine::InterruptLine() {
 	// Set everything to false
@@ -10,7 +10,8 @@ InterruptLine::InterruptLine() {
 }
 
 // Get the highest priority active interrupt request
-Interrupt InterruptLine::get_current() {
+int InterruptLine::get_current() {
+	std::cout << "calling\n";
 	if (status[RESET]) {
 		return RESET;
 	} else if (status[NMI]) {
@@ -22,7 +23,7 @@ Interrupt InterruptLine::get_current() {
 }
 
 // Request an interrupt
-void InterruptLine::request(Interrupt interrupt) {
+void InterruptLine::request(int interrupt) {
 	if (interrupt == NONE) {
 		return;
 	}
@@ -30,7 +31,7 @@ void InterruptLine::request(Interrupt interrupt) {
 }
 
 // Service an interrupt
-void InterruptLine::service(Interrupt interrupt) {
+void InterruptLine::service(int interrupt) {
 	if (interrupt == NONE) {
 		return;
 	}

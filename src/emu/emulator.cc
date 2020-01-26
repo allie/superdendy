@@ -7,7 +7,7 @@ using namespace SuperDendy::Core;
 using namespace SuperDendy::Emu;
 using namespace SuperDendy::Emu::Famicom;
 
-std::unique_ptr<Emulator> Emulator::from_file(
+std::unique_ptr<IEmulator> Emu::get_emulator_for_file(
 	SuperDendy::Core::Logger& logger,
 	SuperDendy::Core::Config& config,
 	SuperDendy::Core::Graphics& graphics,
@@ -19,14 +19,14 @@ std::unique_ptr<Emulator> Emulator::from_file(
 	auto extension = filepath.extension();
 
 	if (extension == ".nes") {
-		return std::unique_ptr<Emulator>(new FamicomEmulator(logger, config, graphics, audio, input, file));
+		return std::unique_ptr<IEmulator>(new Famicom::Emulator(logger, config, graphics, audio, input, file));
 	}
 
 	return nullptr;
 }
 
 // SDL_Thread callback
-void Emulator::callback(void* data) {
-	auto emulator = static_cast<Emulator*>(data);
+void Emu::emulate_callback(void* data) {
+	auto emulator = static_cast<IEmulator*>(data);
 	emulator->emulate();
 }
