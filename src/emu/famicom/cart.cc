@@ -1,77 +1,73 @@
 #include "emu/famicom/cart.h"
 #include "core/utils.h"
+#include "core/logger.h"
 
 using namespace SuperDendy;
 using namespace SuperDendy::Core;
 using namespace SuperDendy::Emu::Famicom;
 
 // Construct a Cart with rom.buffer loaded from a .nes file
-Cart::Cart(
-	SuperDendy::Core::Logger& logger,
-	const char* file
-) :
-	logger(logger)
-{
-	BinaryFile rom(logger, file);
-	// std::cout << file << std::endl;
-	logger.debug("Read ROM file to memory");
+Cart::Cart(const char* file) {
+	BinaryFile rom(file);
+
+	Logger::debug("Read ROM file to memory");
 
 	// Check for NES[EOF]
 	if (rom.buffer[0] != 'N' || rom.buffer[1] != 'E' || rom.buffer[2] != 'S' || rom.buffer[3] != 0x1A) {
-		logger.fatal("Invalid NES ROM file");
+		Logger::fatal("Invalid NES ROM file");
 		throw std::runtime_error("Invalid NES ROM file");
 	}
 
 	name = std::string(file);
-	logger.debug("ROM name: " + name);
+	Logger::debug("ROM name: " + name);
 
 	prg_rom_size = rom.buffer[4];
-	logger.debug("PRG ROM size: " + std::to_string(prg_rom_size));
+	Logger::debug("PRG ROM size: " + std::to_string(prg_rom_size));
 
 	chr_rom_size = rom.buffer[5];
-	logger.debug("CHR ROM size: " + std::to_string(chr_rom_size));
+	Logger::debug("CHR ROM size: " + std::to_string(chr_rom_size));
 
 	prg_ram_size = rom.buffer[8];
-	logger.debug("PRG RAM size: " + std::to_string(prg_ram_size));
+	Logger::debug("PRG RAM size: " + std::to_string(prg_ram_size));
 
 	// Flags 6
 	if (!(rom.buffer[6] & 0x01) && !((rom.buffer[6] & 0x08) >> 3)) {
 		vram_arr = V_MIRROR;
-		logger.debug("VRAM arrangement: V_MIRROR");
+		Logger::debug("VRAM arrangement: V_MIRROR");
 	} else if (!(rom.buffer[6] & 0x01) && ((rom.buffer[6] & 0x08) >> 3)) {
 		vram_arr = H_MIRROR;
-		logger.debug("VRAM arrangement: H_MIRROR");
+		Logger::debug("VRAM arrangement: H_MIRROR");
 	} else if (rom.buffer[6] & 0x01) {
 		vram_arr = Q_SCREEN;
-		logger.debug("VRAM arrangement: Q_SCREEN");
+		Logger::debug("VRAM arrangement: Q_SCREEN");
 	}
 
 	has_sram = (rom.buffer[6] & 0x02) >> 1;
-	logger.debug("Has SRAM: " + std::to_string(has_sram));
+	Logger::debug("Has SRAM: " + std::to_string(has_sram));
 
 	has_trainer = (rom.buffer[6] & 0x04) >> 2;
-	logger.debug("Has trainer: " + std::to_string(has_trainer));
+	Logger::debug("Has trainer: " + std::to_string(has_trainer));
 
 	// Flags 7
 	vs_unisystem = rom.buffer[7] & 0x01;
-	logger.debug("VS UniSystem: " + std::to_string(vs_unisystem));
+	Logger::debug("VS UniSystem: " + std::to_string(vs_unisystem));
 
 	playchoice = (rom.buffer[7] & 0x02) >> 1;
-	logger.debug("PlayChoice: " + std::to_string(playchoice));
+	Logger::debug("PlayChoice: " + std::to_string(playchoice));
 
 	nes2 = ((rom.buffer[7] & 0x0C) >> 2) == 2;
-	logger.debug("INES 2.0: " + std::to_string(nes2));
+	Logger::debug("INES 2.0: " + std::to_string(nes2));
 
 	// Mapper number (flags 6 and 7)
 	mapper_num = ((rom.buffer[6] & 0xF0) >> 4) | (rom.buffer[7] & 0xF0);
-	logger.debug("Mapper: " + std::to_string(mapper_num));
+	Logger::debug("Mapper: " + std::to_string(mapper_num));
 
 	// Flags 9
 	tv_mode = rom.buffer[9] & 0x01;
 	if (tv_mode == NTSC) {
-		logger.debug("TV mode: NTSC");
+		Logger::debug("TV mode: NTSC");
 	} else if (tv_mode == PAL) {
-		logger.debug("TV mode: PAL");
+		Logger::debug("TV mode: PAL");
 	}
 
 	// Flags 10 is ignored

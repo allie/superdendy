@@ -1,15 +1,12 @@
 #include "emu/famicom/cpu_bus.h"
+#include "core/logger.h"
 
 using namespace SuperDendy;
+using namespace SuperDendy::Core;
 using namespace SuperDendy::Emu::Famicom;
 
-CPUBus::CPUBus(
-	SuperDendy::Core::Logger& logger
-) :
-	logger(logger),
-	ram(logger, 0x800)
-{
-	logger.debug("CPU bus instantiated");
+CPUBus::CPUBus() : ram(0x800) {
+	Logger::debug("CPU bus instantiated");
 }
 
 CPUBus::~CPUBus() {

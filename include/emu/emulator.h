@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common.h"
-#include "core/logger.h"
 #include "core/config.h"
 #include "core/graphics.h"
 #include "core/audio.h"
@@ -23,7 +22,6 @@ namespace SuperDendy::Emu {
 	};
 
 	std::unique_ptr<IEmulator> get_emulator_for_file(
-		SuperDendy::Core::Logger& logger,
 		SuperDendy::Core::Config& config,
 		SuperDendy::Core::Graphics& graphics,
 		SuperDendy::Core::Audio& audio,

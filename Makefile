@@ -1,5 +1,5 @@
 CC=clang++
-CFLAGS=-std=c++17 -g -c -Wno-nullability-completeness
+CFLAGS=-std=c++17 -g -c -Wno-nullability-completeness -Wfatal-errors
 INC=-Iinclude -I/usr/local/include -Ilib/inih/
 LDFLAGS=-lSDL2 -lSDL2_image -lm
 SOURCES=$(shell find src -name "*.cc" -not -name "*.partial.cc")

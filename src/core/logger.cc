@@ -4,12 +4,11 @@
 
 using namespace SuperDendy::Core;
 
-Logger::Logger(
-	const std::string& file,
-	LogLevel level
-) :
-	level(level)
-{
+std::ofstream Logger::ofs;
+LogLevel Logger::level = WARN;
+
+void Logger::start(const std::string& file, LogLevel level) {
+	Logger::level = level;
 	ofs.open(file, std::ios_base::app);
 	write_line("LOGGER", "Beginning logging session");
 }

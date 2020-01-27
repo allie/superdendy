@@ -1,7 +1,9 @@
 #include "emu/mos6502/cpu.h"
 #include "emu/mos6502/interrupt.h"
+#include "core/logger.h"
 
 using namespace SuperDendy;
+using namespace SuperDendy::Core;
 using namespace SuperDendy::Emu::MOS6502;
 
 // Status flag bitmasks
@@ -102,16 +104,14 @@ static const Dword timing_lookup[256] = {
 };
 
 CPU::CPU(
-	SuperDendy::Core::Logger& logger,
 	IMemory8& memory,
 	IInterruptLine& interrupt_line,
 	Mode mode
 ) :
-	logger(logger),
 	memory(memory),
 	interrupt_line(interrupt_line)
 {
-	logger.debug("Instantiated MOS6502 emulator");
+	Logger::debug("Instantiated MOS6502 emulator");
 	this->interrupt_line.get_current();
 }
 
@@ -151,7 +151,7 @@ void CPU::power_on() {
 	operand = 0;
 	cycles = 0;
 	suspended = 0;
-	logger.debug("MOS6502 powered on");
+	Logger::debug("MOS6502 powered on");
 }
 
 // Reset the CPU

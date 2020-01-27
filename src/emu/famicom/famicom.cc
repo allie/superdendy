@@ -6,30 +6,28 @@ using namespace SuperDendy::Core;
 using namespace SuperDendy::Emu::Famicom;
 
 Emulator::Emulator(
-	SuperDendy::Core::Logger& logger,
 	SuperDendy::Core::Config& config,
 	SuperDendy::Core::Graphics& graphics,
 	SuperDendy::Core::Audio& audio,
 	SuperDendy::Core::Input& input,
 	const char* file
 ) :
-	logger(logger),
 	config(config),
 	graphics(graphics),
 	audio(audio),
 	input(input),
-	cart(logger, file),
-	cpu_bus(logger),
-	cpu(logger, cpu_bus, interrupt_line, MOS6502::Mode::NES)
+	cart(file),
+	cpu_bus(),
+	cpu(cpu_bus, interrupt_line, MOS6502::Mode::NES)
 {
-	logger.info("Famicom emulator initialized");
+	Logger::info("Famicom emulator initialized");
 }
 
 Emulator::~Emulator() {
 }
 
 void Emulator::load_file(const char* file) {
-	logger.info("Loaded file " + (std::string)file);
+	Logger::info("Loaded file " + (std::string)file);
 }
 
 Dim Emulator::get_dimensions() {
@@ -40,11 +38,11 @@ Dim Emulator::get_dimensions() {
 }
 
 void Emulator::power_on() {
-	logger.info("Famicom powered on");
+	Logger::info("Famicom powered on");
 }
 
 void Emulator::reset() {
-	logger.info("Famicom reset");
+	Logger::info("Famicom reset");
 }
 
 Dword Emulator::step() {

@@ -1,13 +1,12 @@
 #include "core/graphics.h"
+#include "core/logger.h"
 #include <stdexcept>
 
 using namespace SuperDendy::Core;
 
 Graphics::Graphics(
-	Logger& logger,
 	Config& config
 ) :
-	logger(logger),
 	config(config)
 {
 }
@@ -31,7 +30,7 @@ void Graphics::create_window(Dim dimensions) {
 	);
 
 	if (window == nullptr) {
-		logger.fatal("Error creating window: " + (std::string)SDL_GetError());
+		Logger::fatal("Error creating window: " + (std::string)SDL_GetError());
 		throw std::runtime_error("Failed to create window");
 	}
 
@@ -42,7 +41,7 @@ void Graphics::create_window(Dim dimensions) {
 	);
 
 	if (renderer == nullptr) {
-		logger.fatal("Error creating renderer: " + (std::string)SDL_GetError());
+		Logger::fatal("Error creating renderer: " + (std::string)SDL_GetError());
 		throw std::runtime_error("Failed to initialize renderer");
 	}
 
@@ -71,7 +70,7 @@ void Graphics::render_buffer(RGB* buffer, int width, int height, int x, int y) {
 	);
 
 	if (surface == NULL) {
-		logger.fatal("Creating surface failed: " + (std::string)SDL_GetError());
+		Logger::fatal("Creating surface failed: " + (std::string)SDL_GetError());
 		throw std::runtime_error("Failed to create surface");
 	}
 
@@ -98,7 +97,7 @@ void Graphics::render_buffer(RGBA* buffer, int width, int height, int x, int y) 
 	);
 
 	if (surface == NULL) {
-		logger.fatal("Creating surface failed: " + (std::string)SDL_GetError());
+		Logger::fatal("Creating surface failed: " + (std::string)SDL_GetError());
 		throw std::runtime_error("Failed to create surface");
 	}
 

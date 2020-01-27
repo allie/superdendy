@@ -17,19 +17,22 @@ namespace SuperDendy::Core {
 
 	class Logger {
 	private:
-		std::ofstream ofs;
-		void write_line(const std::string& prefix, const std::string& message);
+		Logger() {};
+
+		static std::ofstream ofs;
+		static void write_line(const std::string& prefix, const std::string& message);
 
 	public:
-		LogLevel level;
+		static LogLevel level;
 
-		Logger(const std::string& file, LogLevel level);
 		~Logger();
 
-		void debug(const std::string& message);
-		void info(const std::string& message);
-		void warn(const std::string& message);
-		void error(const std::string& message);
-		void fatal(const std::string& message);
+		static void start(const std::string& file, LogLevel level);
+		static void debug(const std::string& message);
+		static void info(const std::string& message);
+		static void warn(const std::string& message);
+		static void error(const std::string& message);
+		static void fatal(const std::string& message);
+		static void stop();
 	};
 };

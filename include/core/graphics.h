@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common.h"
-#include "logger.h"
 #include "config.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -10,7 +9,6 @@
 namespace SuperDendy::Core {
 	class Graphics {
 	private:
-		Logger& logger;
 		Config& config;
 		SDL_Window* window;
 		SDL_Renderer* renderer;
@@ -18,7 +16,7 @@ namespace SuperDendy::Core {
 		Dim dim;
 
 	public:
-		Graphics(Logger& logger, Config& config);
+		Graphics(Config& config);
 		~Graphics();
 
 		void create_window(Dim dimensions);

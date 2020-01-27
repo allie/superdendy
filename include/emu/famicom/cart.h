@@ -2,7 +2,6 @@
 
 #include "common.h"
 #include "emu/famicom/mapper.h"
-#include "core/logger.h"
 #include <string>
 #include <memory>
 
@@ -20,7 +19,6 @@ namespace SuperDendy::Emu::Famicom {
 
 	class Cart {
 	private:
-		SuperDendy::Core::Logger& logger;
 		Byte prg_rom_size;
 		Byte chr_rom_size;
 		Byte prg_ram_size;
@@ -41,7 +39,7 @@ namespace SuperDendy::Emu::Famicom {
 	public:
 		std::string name;
 
-		Cart(SuperDendy::Core::Logger& logger, const char* file);
+		Cart(const char* file);
 		~Cart();
 
 		Byte read_cpu(Word addr);

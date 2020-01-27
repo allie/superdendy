@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common.h"
-#include "core/logger.h"
 #include "emu/memory.h"
 #include "emu/mos6502/interrupt.h"
 
@@ -103,7 +102,6 @@ namespace SuperDendy::Emu::MOS6502 {
 
 	class CPU {
 	private:
-		SuperDendy::Core::Logger& logger;
 		IMemory8& memory;
 		IInterruptLine& interrupt_line;
 
@@ -142,7 +140,6 @@ namespace SuperDendy::Emu::MOS6502 {
 
 	public:
 		CPU(
-			SuperDendy::Core::Logger& logger,
 			IMemory8& memory,
 			IInterruptLine& interrupt_line,
 			Mode mode

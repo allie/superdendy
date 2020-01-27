@@ -5,13 +5,7 @@
 using namespace SuperDendy;
 using namespace SuperDendy::Emu;
 
-SimpleRAM8::SimpleRAM8(
-	SuperDendy::Core::Logger& logger,
-	int size
-) :
-	logger(logger),
-	size(size)
-{
+SimpleRAM8::SimpleRAM8(int size) : size(size) {
 	data = new Byte[size];
 }
 

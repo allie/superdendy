@@ -11,7 +11,6 @@ InterruptLine::InterruptLine() {
 
 // Get the highest priority active interrupt request
 int InterruptLine::get_current() {
-	std::cout << "calling\n";
 	if (status[RESET]) {
 		return RESET;
 	} else if (status[NMI]) {

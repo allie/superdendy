@@ -1,4 +1,5 @@
 #include "core/config.h"
+#include "core/logger.h"
 #include "INIReader.h"
 #include <string>
 #include <iostream>
@@ -8,10 +9,8 @@
 using namespace SuperDendy::Core;
 
 Config::Config(
-	Logger& logger,
 	const std::string& file
 ) :
-	logger(logger),
 	file(file)
 {
 	std::ifstream ifs(file);
@@ -19,7 +18,7 @@ Config::Config(
 	if (ifs.good()) {
 		load();
 	} else {
-		logger.info("Could not locate configuration file, creating a new one");
+		Logger::info("Could not locate configuration file, creating a new one");
 		load_defaults();
 		write();
 	}
@@ -33,7 +32,7 @@ void Config::load() {
 	INIReader reader(file);
 
 	if (reader.ParseError() < 0) {
-		logger.fatal("Failed to open configuration file");
+		Logger::fatal("Failed to open configuration file");
 		throw std::runtime_error("Failed to open configuration file");
 	}
 
@@ -42,7 +41,7 @@ void Config::load() {
 	window_scale = reader.GetInteger("interface", "window_scale", 1);
 	volume = (float)reader.GetReal("interface", "volume", 1.0);
 
-	logger.info("Successfully loaded configuration file");
+	Logger::info("Successfully loaded configuration file");
 }
 
 void Config::load_defaults() {

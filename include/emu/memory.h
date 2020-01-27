@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common.h"
-#include "core/logger.h"
 
 namespace SuperDendy::Emu {
 	class IMemory8 {
@@ -16,12 +15,11 @@ namespace SuperDendy::Emu {
 
 	class SimpleRAM8 : public IMemory8 {
 	private:
-		SuperDendy::Core::Logger& logger;
 		Byte* data;
 		int size;
 
 	public:
-		SimpleRAM8(SuperDendy::Core::Logger&, int size);
+		SimpleRAM8(int size);
 		~SimpleRAM8();
 
 		Byte peek(Word addr) const override;

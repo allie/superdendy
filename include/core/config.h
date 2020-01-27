@@ -1,14 +1,12 @@
 #pragma once
 
 #include "common.h"
-#include "logger.h"
 #include <map>
 #include <string>
 
 namespace SuperDendy::Core {
 	class Config {
 	private:
-		Logger& logger;
 		std::string file;
 
 		Qword pack_keysym(SDL_Keysym sym);
@@ -22,7 +20,7 @@ namespace SuperDendy::Core {
 		int window_scale;
 		float volume;
 
-		Config(Logger& logger, const std::string& file);
+		Config(const std::string& file);
 		~Config();
 
 		void load();

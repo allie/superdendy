@@ -10,7 +10,6 @@
 namespace SuperDendy::Emu::Famicom {
 	class Emulator : public IEmulator {
 	private:
-		SuperDendy::Core::Logger& logger;
 		SuperDendy::Core::Config& config;
 		SuperDendy::Core::Graphics& graphics;
 		SuperDendy::Core::Audio& audio;
@@ -25,7 +24,6 @@ namespace SuperDendy::Emu::Famicom {
 
 	public:
 		Emulator(
-			SuperDendy::Core::Logger& logger,
 			SuperDendy::Core::Config& config,
 			SuperDendy::Core::Graphics& graphics,
 			SuperDendy::Core::Audio& audio,
