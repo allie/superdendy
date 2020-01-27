@@ -47,6 +47,7 @@ void Emulator::reset() {
 
 Dword Emulator::step() {
 	Dword cycles = cpu.step();
+	cpu_bus.dump("cpu_bus.bin");
 	return cycles;
 }
 

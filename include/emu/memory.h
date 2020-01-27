@@ -11,6 +11,8 @@ namespace SuperDendy::Emu {
 		virtual Byte read(Word addr) = 0;
 		virtual void write(Word addr, Byte val) = 0;
 		virtual int get_size() = 0;
+
+		virtual void dump(const char* file);
 	};
 
 	class SimpleRAM8 : public IMemory8 {

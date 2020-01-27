@@ -17,8 +17,8 @@ namespace SuperDendy::Emu::Famicom {
 
 		Cart cart;
 		CPUBus cpu_bus;
-		MOS6502::CPU cpu;
 		MOS6502::InterruptLine interrupt_line;
+		MOS6502::CPU cpu;
 
 		Dword step();
 

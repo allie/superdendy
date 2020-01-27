@@ -3,6 +3,7 @@
 *.exe
 *.log
 *.dump
+*.bin
 *.nes
 .vscode
 superdendy

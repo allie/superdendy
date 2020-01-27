@@ -103,7 +103,7 @@ namespace SuperDendy::Emu::MOS6502 {
 	class CPU {
 	private:
 		IMemory8& memory;
-		IInterruptLine& interrupt_line;
+		InterruptLine& interrupt_line;
 
 		void pushb(Byte val);
 		void pushw(Word val);
@@ -141,7 +141,7 @@ namespace SuperDendy::Emu::MOS6502 {
 	public:
 		CPU(
 			IMemory8& memory,
-			IInterruptLine& interrupt_line,
+			InterruptLine& interrupt_line,
 			Mode mode
 		);
 		~CPU();

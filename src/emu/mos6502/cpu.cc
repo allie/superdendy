@@ -105,14 +105,13 @@ static const Dword timing_lookup[256] = {
 
 CPU::CPU(
 	IMemory8& memory,
-	IInterruptLine& interrupt_line,
+	InterruptLine& interrupt_line,
 	Mode mode
 ) :
 	memory(memory),
 	interrupt_line(interrupt_line)
 {
 	Logger::debug("Instantiated MOS6502 emulator");
-	this->interrupt_line.get_current();
 }
 
 CPU::~CPU() {
@@ -143,7 +142,8 @@ void CPU::power_on() {
 	y = 0;
 	status.value = 0x34;
 	sp = 0xFD;
-	pc = READ_W(0xFFFC);
+	// pc = READ_W(0xFFFC);
+	pc = 0xC000;
 	opcode = 0;
 	oper_addr = 0;
 	ind_oper_addr = 0;
