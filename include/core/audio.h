@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include "common/data.h"
 #include "config.h"
 #include <SDL2/SDL.h>
 #include <queue>

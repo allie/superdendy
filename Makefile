@@ -1,5 +1,5 @@
 CC=clang++
-CFLAGS=-std=c++17 -g -c -Wno-nullability-completeness -Wfatal-errors
+CFLAGS=-std=c++17 -g -Wno-nullability-completeness
 INC=-Iinclude -I/usr/local/include -Ilib/inih/
 LDFLAGS=-lSDL2 -lSDL2_image -lm
 SOURCES=$(shell find src -name "*.cc" -not -name "*.partial.cc")
@@ -26,7 +26,7 @@ $(EXECUTABLE): $(OBJECTS)
 
 $(OBJDIR)/%.o: %.cc
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) $(INC) $< -o $@
+	$(CC) $(CFLAGS) -c $(INC) $< -o $@
 
 clean:
 	rm -f $(EXECUTABLE)

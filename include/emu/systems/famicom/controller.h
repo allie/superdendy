@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include "common/data.h"
 
 namespace SuperDendy::Emu::Famicom {
 	typedef union {

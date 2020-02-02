@@ -1,7 +1,9 @@
 #pragma once
 
-#include "common.h"
-#include "emu/famicom/mapper.h"
+#include "common/data.h"
+#include "common/binary_file.h"
+#include "emu/memory.h"
+#include "emu/systems/famicom/mapper.h"
 #include <string>
 #include <memory>
 
@@ -30,23 +32,27 @@ namespace SuperDendy::Emu::Famicom {
 		Byte playchoice;
 		Byte nes2;
 		Byte tv_mode;
-		Byte* trainer;
-		Byte* prg;
-		Byte* chr;
-		Byte* sram;
+
+		std::unique_ptr<SimpleRAM8> trainer;
+		std::unique_ptr<SimpleRAM8> prg;
+		std::unique_ptr<SimpleRAM8> chr;
+		std::unique_ptr<SimpleRAM8> sram;
+
 		std::unique_ptr<Mapper> mapper;
 
 	public:
 		std::string name;
 
-		Cart(const char* file);
+		Cart() = default;
 		~Cart();
 
+		void load_file(BinaryFile& file);
 		Byte read_cpu(Word addr);
 		void write_cpu(Word addr, Byte val);
 		Byte peek_cpu(Word addr);
 		Byte read_ppu(Word addr);
 		void write_ppu(Word addr, Byte val);
 		Byte peek_ppu(Word addr);
+		void step();
 	};
 }

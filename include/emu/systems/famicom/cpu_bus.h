@@ -1,15 +1,18 @@
 #pragma once
 
-#include "common.h"
+#include "common/data.h"
 #include "emu/memory.h"
+#include "emu/systems/famicom/cart.h"
 
 namespace SuperDendy::Emu::Famicom {
-	class CPUBus : public IMemory8 {
+	class CPUBus : public Memory8 {
 	private:
 		SimpleRAM8 ram;
+		Cart& cart;
+		std::string test_output;
 
 	public:
-		CPUBus();
+		CPUBus(Cart& cart);
 		~CPUBus();
 
 		Byte peek(Word addr) const override;

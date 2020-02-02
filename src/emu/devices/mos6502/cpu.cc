@@ -1,5 +1,5 @@
-#include "emu/mos6502/cpu.h"
-#include "emu/mos6502/interrupt.h"
+#include "emu/devices/mos6502/cpu.h"
+#include "emu/devices/mos6502/interrupt.h"
 #include "core/logger.h"
 
 using namespace SuperDendy;
@@ -15,27 +15,32 @@ using namespace SuperDendy::Emu::MOS6502;
 #define FLAG_V 0x40
 #define FLAG_N 0x80
 
+// Flag manip macros
+#define SET_FLAG(f) s |= (f)
+#define CLEAR_FLAG(f) s &= ~(f)
+#define GET_FLAG(f) (s & (f))
+
 // Stack base address
 #define STACK_ADDR 0x100
 
 // Flag calc macros
-#define CALC_C(n) if ((n)) status.c = 1; else status.c = 0;
-#define CALC_Z(n) if ((n) == 0) status.z = 1; else status.z = 0;
-#define CALC_I(n) if ((n)) status.c = 1; else status.i = 0;
-#define CALC_B(n) if ((n)) status.b = 1; else status.b = 0;
-#define CALC_V(n) if ((n)) status.v = 1; else status.v = 0;
-#define CALC_N(c) if ((c) & 0x80) status.n = 1; else status.n = 0;
+#define CALC_C(c) if ((c)) SET_FLAG(FLAG_C); else CLEAR_FLAG(FLAG_C)
+#define CALC_Z(n) if ((n) == 0) SET_FLAG(FLAG_Z); else CLEAR_FLAG(FLAG_Z)
+#define CALC_I(c) if ((c)) SET_FLAG(FLAG_I); else CLEAR_FLAG(FLAG_I)
+#define CALC_B(c) if ((c)) SET_FLAG(FLAG_B); else CLEAR_FLAG(FLAG_B)
+#define CALC_V(c) if ((c)) SET_FLAG(FLAG_V); else CLEAR_FLAG(FLAG_V)
+#define CALC_N(n) if ((n) & 0x80) SET_FLAG(FLAG_N); else CLEAR_FLAG(FLAG_N)
 
 #define ADD_OFFSET() \
 	Word old_pc = pc; \
 	pc += (int8_t)operand; \
 	if ((pc & 0xFF00) != (old_pc & 0xFF00)) cycles += 2; \
-	else cycles++;
+	else cycles++
 
 #define CALC_PAGE_PENALTY() \
 	if (((addr_mode == ABX) && (x > (oper_addr & 0x00FF))) || \
 		((addr_mode == ABY || addr_mode == IDY) && (y > (oper_addr & 0x00FF)))) \
-		cycles++;
+		cycles++
 
 // Read 2 bytes
 #define READ_W(a) ((Word)memory.read((a)) | ((Word)memory.read((a) + 1) << 8))
@@ -104,7 +109,7 @@ static const Dword timing_lookup[256] = {
 };
 
 CPU::CPU(
-	IMemory8& memory,
+	Memory8& memory,
 	InterruptLine& interrupt_line,
 	Mode mode
 ) :
@@ -140,10 +145,13 @@ void CPU::power_on() {
 	a = 0;
 	x = 0;
 	y = 0;
-	status.value = 0x34;
+	s = 0x34;
 	sp = 0xFD;
-	// pc = READ_W(0xFFFC);
+#ifdef NESTEST
 	pc = 0xC000;
+#else
+	pc = READ_W(0xFFFC);
+#endif
 	opcode = 0;
 	oper_addr = 0;
 	ind_oper_addr = 0;
@@ -158,7 +166,7 @@ void CPU::power_on() {
 void CPU::reset() {
 	pc = READ_W(0xFFFC);
 	sp -= 3;
-	status.i = 1;
+	SET_FLAG(FLAG_I);
 	cycles = 0;
 	suspended = 0;
 }
@@ -181,21 +189,21 @@ Dword CPU::step() {
 	int interrupt = interrupt_line.get_current();
 	switch (interrupt) {
 		case IRQ:
-			if (!status.i) {
-				status.b = 0;
+			if (!GET_FLAG(FLAG_I)) {
+				CLEAR_FLAG(FLAG_B);
 				pushw(pc);
-				pushb(status.value);
-				status.i = 1;
+				pushb(s);
+				SET_FLAG(FLAG_I);
 				pc = READ_W(0xFFFE);
 				interrupt_line.service(IRQ);
 			}
 			break;
 
 		case NMI:
-			status.b = 0;
+			CLEAR_FLAG(FLAG_B);
 			pushw(pc);
-			pushb(status.value);
-			status.i = 1;
+			pushb(s);
+			SET_FLAG(FLAG_I);
 			pc = READ_W(0xFFFA);
 			interrupt_line.service(NMI);
 			break;
@@ -203,13 +211,17 @@ Dword CPU::step() {
 		case RESET:
 			pc = READ_W(0xFFFC);
 			sp = 0xFD;
-			status.value |= 0x24;
+			s |= 0x24;
 			interrupt_line.service(RESET);
 			break;
 	}
 
 	// Fetch opcode
 	opcode = memory.read(pc++);
+
+#ifdef NESTEST
+	nestest_disassemble1();
+#endif
 
 	// Addressing mode: fetch operand address
 	AddressingMode addr_mode = addr_mode_lookup[opcode];
@@ -300,6 +312,10 @@ Dword CPU::step() {
 		operand = 0;
 	}
 
+#ifdef NESTEST
+	nestest_disassemble2(addr_mode);
+#endif
+
 	// Execute CPU instruction
 	Instruction instr = instr_lookup[opcode];
 	Byte b;
@@ -308,7 +324,7 @@ Dword CPU::step() {
 		// Add memory to the accumulator with carry
 		// N Z C V
 		case ADC: {
-			w = (Word)a + operand + status.c;
+			w = (Word)a + operand + GET_FLAG(FLAG_C);
 			CALC_Z(w & 0x00FF);
 			CALC_C(w & 0xFF00);
 			CALC_N(w);
@@ -350,7 +366,7 @@ Dword CPU::step() {
 		// Branch on carry clear
 		// No flags changed
 		case BCC: {
-			if (!status.c) {
+			if (!GET_FLAG(FLAG_C)) {
 				ADD_OFFSET();
 			}
 			break;
@@ -358,7 +374,7 @@ Dword CPU::step() {
 		// Branch on carry set
 		// No flags changed
 		case BCS: {
-			if (status.c) {
+			if (GET_FLAG(FLAG_C)) {
 				ADD_OFFSET();
 			}
 			break;
@@ -366,7 +382,7 @@ Dword CPU::step() {
 		// Branch on b zero (zero set)
 		// No flags changed
 		case BEQ: {
-			if (status.z) {
+			if (GET_FLAG(FLAG_Z)) {
 				ADD_OFFSET();
 			}
 			break;
@@ -383,7 +399,7 @@ Dword CPU::step() {
 		// Branch on b minus (N set)
 		// No flags changed
 		case BMI: {
-			if (status.n) {
+			if (GET_FLAG(FLAG_N)) {
 				ADD_OFFSET();
 			}
 			break;
@@ -391,7 +407,7 @@ Dword CPU::step() {
 		// Branch on b not zero (zero cleared)
 		// No flags changed
 		case BNE: {
-			if (!status.z) {
+			if (!GET_FLAG(FLAG_Z)) {
 				ADD_OFFSET();
 			}
 			break;
@@ -399,7 +415,7 @@ Dword CPU::step() {
 		// Branch on b plus (N cleared)
 		// No flags changed
 		case BPL: {
-			if (!status.n) {
+			if (!GET_FLAG(FLAG_N)) {
 				ADD_OFFSET();
 			}
 			break;
@@ -407,18 +423,18 @@ Dword CPU::step() {
 		// Force break
 		// I=1
 		case BRK: {
-			status.b = 1;
+			SET_FLAG(FLAG_B);
 			pc++;
 			pushw(pc);
-			pushb(status.value);
-			status.i = 1;
+			pushb(s);
+			SET_FLAG(FLAG_I);
 			pc = READ_W(0xFFFE);
 			break;
 		}
 		// Branch on overflow clear
 		// No flags changed
 		case BVC: {
-			if (!status.v) {
+			if (!GET_FLAG(FLAG_V)) {
 				ADD_OFFSET();
 			}
 			break;
@@ -426,7 +442,7 @@ Dword CPU::step() {
 		// Branch on overflow set
 		// No flags changed
 		case BVS: {
-			if (status.v) {
+			if (GET_FLAG(FLAG_V)) {
 				ADD_OFFSET();
 			}
 			break;
@@ -434,25 +450,25 @@ Dword CPU::step() {
 		// Clear carry flag
 		// C=0
 		case CLC: {
-			status.c = 0;
+			CLEAR_FLAG(FLAG_C);
 			break;
 		}
 		// Clear decimal mode (NOT USED IN NES MODE)
 		// D=0
 		case CLD: {
-			status.d = 0;
+			CLEAR_FLAG(FLAG_D);
 			break;
 		}
 		// Clear interrupt disable flag
 		// I=0
 		case CLI: {
-			status.i = 0;
+			CLEAR_FLAG(FLAG_I);
 			break;
 		}
 		// Clear overflow flag
 		// V=0
 		case CLV: {
-			status.v = 0;
+			CLEAR_FLAG(FLAG_V);
 			break;
 		}
 		// Compare memory and accumulator
@@ -632,7 +648,7 @@ Dword CPU::step() {
 		// Push processor status onto stack
 		// No flags changed
 		case PHP: {
-			pushb(status.value | FLAG_B);
+			pushb(s | FLAG_B);
 			break;
 		}
 		// Pull accumulator from stack
@@ -646,14 +662,14 @@ Dword CPU::step() {
 		// Pull processor status from stack
 		// N Z C I D V = pull from stack
 		case PLP: {
-			status.value = (pullb() & ~(FLAG_B)) | 0x20;
+			s = (pullb() & ~(FLAG_B)) | 0x20;
 			break;
 		}
 		// Rotate accumulator left one bit
 		// N Z C
 		case ROLA: {
 			b = a << 1;
-			b |= status.c;
+			b |= GET_FLAG(FLAG_C);
 			CALC_C(a & 0x80);
 			CALC_Z(b);
 			CALC_N(b);
@@ -664,7 +680,7 @@ Dword CPU::step() {
 		// N Z C
 		case ROL: {
 			b = operand << 1;
-			b |= status.c;
+			b |= GET_FLAG(FLAG_C);
 			CALC_C(operand & 0x80);
 			CALC_Z(b);
 			CALC_N(b);
@@ -675,7 +691,7 @@ Dword CPU::step() {
 		// N Z C
 		case RORA: {
 			b = a >> 1;
-			if (status.c)
+			if (GET_FLAG(FLAG_C))
 				b |= 0x80;
 			CALC_C(a & 1);
 			CALC_Z(b);
@@ -687,7 +703,7 @@ Dword CPU::step() {
 		// N Z C
 		case ROR: {
 			b = operand >> 1;
-			if (status.c)
+			if (GET_FLAG(FLAG_C))
 				b |= 0x80;
 			CALC_C(operand & 1);
 			CALC_Z(b);
@@ -698,7 +714,7 @@ Dword CPU::step() {
 		// Return from interrupt
 		// N Z C I D V = pull from stack
 		case RTI: {
-			status.value = (pullb() & ~(FLAG_B)) | 0x20;
+			s = (pullb() & ~(FLAG_B)) | 0x20;
 			pc = pullw();
 			break;
 		}
@@ -712,7 +728,7 @@ Dword CPU::step() {
 		// Subtract memory from accumulator with borrow
 		// N Z C V
 		case SBC: {
-			w = (Word)a - operand - (1-status.c);
+			w = (Word)a - operand - (1 - GET_FLAG(FLAG_C));
 			CALC_Z(w & 0x00FF);
 			CALC_N(w);
 			CALC_C(!(w & 0xFF00));
@@ -724,19 +740,19 @@ Dword CPU::step() {
 		// Set carry flag
 		// C=1
 		case SEC: {
-			status.c = 1;
+			SET_FLAG(FLAG_C);
 			break;
 		}
 		// Set decimal mode (NOT USED IN NES MODE)
 		// D=1
 		case SED: {
-			status.d = 1;
+			SET_FLAG(FLAG_D);
 			break;
 		}
 		// Set interrupt disable flag
 		// I=1
 		case SEI: {
-			status.i = 1;
+			SET_FLAG(FLAG_I);
 			break;
 		}
 		// Store accumulator in memory
@@ -803,7 +819,7 @@ Dword CPU::step() {
 			CALC_N(a);
 			break;
 		}
-/*
+/* TODO: finish porting these
 		// DEC memory and CMP b with accumulator (UNOFFICIAL)
 		// ?
 		case DCP: {
@@ -881,5 +897,13 @@ Dword CPU::step() {
 	// Add cycles to the total cycle count
 	cycles += timing_lookup[opcode];
 
+#ifdef NESTEST
+	nestest_disassemble3();
+#endif
+
 	return cycles - lastcycles;
 }
+
+#ifdef NESTEST
+#include "nestest.partial.cc"
+#endif

@@ -1,4 +1,4 @@
-#include "emu/famicom/mapper.h"
+#include "emu/systems/famicom/mapper.h"
 
 using namespace SuperDendy::Emu::Famicom;
 

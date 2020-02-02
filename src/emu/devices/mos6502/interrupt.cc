@@ -1,4 +1,4 @@
-#include "emu/mos6502/interrupt.h"
+#include "emu/devices/mos6502/interrupt.h"
 #include <iostream>
 using namespace SuperDendy::Emu::MOS6502;
 

@@ -1,3 +1,4 @@
+#include "common/utils.h"
 #include "core/logger.h"
 #include "core/config.h"
 #include "core/input.h"
@@ -37,13 +38,14 @@ int main(int argc, char* argv[]) {
 
 	graphics.create_window(emulator->get_dimensions());
 
+	running = true;
+
 	SDL_Thread* system_thread = SDL_CreateThread((SDL_ThreadFunction)emulate_callback, "system", emulator.get());
-	if (system_thread == NULL) {
+	if (system_thread == nullptr) {
 		Logger::fatal(SDL_GetError());
 		return 1;
 	}
 
-	bool running = true;
 	while (running) {
 		SDL_Event e;
 		while (SDL_PollEvent(&e) != 0) {

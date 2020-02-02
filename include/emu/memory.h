@@ -1,11 +1,12 @@
 #pragma once
 
-#include "common.h"
+#include "common/data.h"
 
 namespace SuperDendy::Emu {
-	class IMemory8 {
+	// 8-bit memory interface
+	class Memory8 {
 	public:
-		virtual ~IMemory8() {};
+		virtual ~Memory8() {};
 
 		virtual Byte peek(Word addr) const = 0;
 		virtual Byte read(Word addr) = 0;
@@ -15,13 +16,14 @@ namespace SuperDendy::Emu {
 		virtual void dump(const char* file);
 	};
 
-	class SimpleRAM8 : public IMemory8 {
+	class SimpleRAM8 : public Memory8 {
 	private:
 		Byte* data;
 		int size;
 
 	public:
 		SimpleRAM8(int size);
+		SimpleRAM8(Byte* initial_data, int size);
 		~SimpleRAM8();
 
 		Byte peek(Word addr) const override;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include "common/data.h"
 #include "core/config.h"
 #include <SDL2/SDL.h>
 #include <string>

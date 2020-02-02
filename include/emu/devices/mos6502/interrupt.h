@@ -10,7 +10,7 @@ namespace SuperDendy::Emu::MOS6502 {
 		IRQ
 	};
 
-	class InterruptLine : public IInterruptLine {
+	class InterruptLine : public Emu::InterruptLine {
 	private:
 		bool status[4];
 

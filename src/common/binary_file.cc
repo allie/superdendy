@@ -1,12 +1,16 @@
-#include "core/utils.h"
+#include "common/binary_file.h"
 #include "core/logger.h"
-#include <cstdlib>
-#include <cstdio>
+#include <iostream>
+#include <fstream>
 
 using namespace SuperDendy;
 using namespace SuperDendy::Core;
 
-BinaryFile::BinaryFile(const char* file) {
+BinaryFile::BinaryFile(
+	const char* file
+) :
+	path(file)
+{
 	std::ifstream ifs(file, std::ios::binary | std::ios::ate);
 
 	if (ifs.good()) {
@@ -31,4 +35,8 @@ BinaryFile::~BinaryFile() {
 
 long int BinaryFile::get_size() {
 	return size;
+}
+
+std::string BinaryFile::get_path() {
+	return path;
 }

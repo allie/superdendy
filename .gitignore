@@ -8,6 +8,4 @@
 .vscode
 superdendy
 build
-tests
-removed
-research
+test_roms

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "common.h"
+#include "common/data.h"
 #include "emu/memory.h"
-#include "emu/mos6502/interrupt.h"
+#include "emu/devices/mos6502/interrupt.h"
 
 namespace SuperDendy::Emu::MOS6502 {
 	enum Mode {
@@ -102,7 +102,7 @@ namespace SuperDendy::Emu::MOS6502 {
 
 	class CPU {
 	private:
-		IMemory8& memory;
+		Memory8& memory;
 		InterruptLine& interrupt_line;
 
 		void pushb(Byte val);
@@ -116,19 +116,7 @@ namespace SuperDendy::Emu::MOS6502 {
 		Byte a;
 		Byte x;
 		Byte y;
-
-		union {
-			struct {
-				Byte c : 1;
-				Byte z : 1;
-				Byte i : 1;
-				Byte d : 1;
-				Byte b : 2; // unused
-				Byte v : 1;
-				Byte n : 1;
-			};
-			Byte value;
-		} status;
+		Byte s; // status
 
 		Byte opcode;
 		Word oper_addr;
@@ -138,9 +126,15 @@ namespace SuperDendy::Emu::MOS6502 {
 		Dword cycles;
 		Dword suspended;
 
+#ifdef NESTEST
+		void nestest_disassemble1();
+		void nestest_disassemble2(AddressingMode addr_mode);
+		void nestest_disassemble3();
+#endif
+
 	public:
 		CPU(
-			IMemory8& memory,
+			Memory8& memory,
 			InterruptLine& interrupt_line,
 			Mode mode
 		);

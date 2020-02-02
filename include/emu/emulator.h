@@ -1,6 +1,7 @@
 #pragma once
 
-#include "common.h"
+#include "common/data.h"
+#include "common/binary_file.h"
 #include "core/config.h"
 #include "core/graphics.h"
 #include "core/audio.h"
@@ -9,11 +10,12 @@
 #include <memory>
 
 namespace SuperDendy::Emu {
-	class IEmulator {
+	class Emulator {
 	public:
-		virtual ~IEmulator() {};
+		virtual ~Emulator() {};
 
-		virtual void load_file(const char* file) = 0;
+		virtual bool test_file(BinaryFile& file) = 0;
+		virtual void load_file(BinaryFile& file) = 0;
 		virtual Dim get_dimensions() = 0;
 		virtual void power_on() = 0;
 		virtual void reset() = 0;
@@ -21,13 +23,15 @@ namespace SuperDendy::Emu {
 		virtual void render() = 0;
 	};
 
-	std::unique_ptr<IEmulator> get_emulator_for_file(
-		SuperDendy::Core::Config& config,
-		SuperDendy::Core::Graphics& graphics,
-		SuperDendy::Core::Audio& audio,
-		SuperDendy::Core::Input& input,
+	// Factory
+	std::shared_ptr<Emulator> get_emulator_for_file(
+		Core::Config& config,
+		Core::Graphics& graphics,
+		Core::Audio& audio,
+		Core::Input& input,
 		const char* file
 	);
 
+	// SDL_Thread callback
 	void emulate_callback(void* data);
 }

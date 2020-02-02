@@ -1,9 +1,9 @@
 #pragma once
 
-#include "common.h"
+#include "common/data.h"
 
 namespace SuperDendy::Emu {
-	class IInterruptLine {
+	class InterruptLine {
 	public:
 		virtual int get_current() = 0;
 		virtual void request(int interrupt) = 0;

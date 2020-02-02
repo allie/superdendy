@@ -1,4 +1,4 @@
-#include "emu/famicom/controller.h"
+#include "emu/systems/famicom/controller.h"
 
 using namespace SuperDendy;
 using namespace SuperDendy::Emu::Famicom;

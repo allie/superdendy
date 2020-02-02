@@ -1,15 +1,24 @@
-#include "emu/famicom/cpu_bus.h"
+#include "emu/systems/famicom/cpu_bus.h"
+#include "common/utils.h"
 #include "core/logger.h"
+#include <iostream>
 
 using namespace SuperDendy;
 using namespace SuperDendy::Core;
 using namespace SuperDendy::Emu::Famicom;
 
-CPUBus::CPUBus() : ram(0x800) {
+CPUBus::CPUBus(
+	Cart& cart
+) :
+	cart(cart),
+	ram(0x800),
+	test_output("")
+{
 	Logger::debug("CPU bus instantiated");
 }
 
 CPUBus::~CPUBus() {
+	// Destructor
 }
 
 Byte CPUBus::peek(Word addr) const {
@@ -24,8 +33,7 @@ Byte CPUBus::peek(Word addr) const {
 	}
 	// Cartridge address range
 	if (in_range(addr, 0x4020, 0xFFFF)) {
-		// return cart.peek_cpu(addr);
-		return 0x00;
+		return cart.peek_cpu(addr);
 	}
 	// Invalid read operation or not yet implemented, just return 0
 	return 0;
@@ -48,8 +56,7 @@ Byte CPUBus::read(Word addr) {
 	}
 	// Cartridge address range
 	if (in_range(addr, 0x4020, 0xFFFF)) {
-		// return cart.read_cpu(addr);
-		return 0x00;
+		return cart.read_cpu(addr);
 	}
 	// Invalid read operation or not yet implemented
 	Logger::debug("Invalid CPU read at address " + std::to_string(addr));
@@ -57,6 +64,25 @@ Byte CPUBus::read(Word addr) {
 }
 
 void CPUBus::write(Word addr, Byte val) {
+	// Test ROM output
+	int debug_log = 0;
+	if (in_range(addr, 0x6001, 0x6003)) {
+		debug_log |= val << ((2 - (addr - 0x6001)) * 8);
+	}
+	if (debug_log == 0xDEB061) {
+		if (addr == 0x6000) {
+			Logger::info("Test status: " + std::to_string(val));
+		}
+
+		if (in_range(addr, 0x6004, 0x1000)) {
+			if (val == 0) {
+				Logger::info("Test output: " + test_output);
+				debug_log = 0;
+			} else {
+				test_output += (char)val;
+			}
+		}
+	}
 	// Working RAM address range (mirrored every 2KB)
 	if (in_range(addr, 0x0000, 0x1FFF)) {
 		ram.write(addr & 0x07FF, val);
@@ -80,7 +106,7 @@ void CPUBus::write(Word addr, Byte val) {
 	}
 	// Cartridge address range
 	if (in_range(addr, 0x4020, 0xFFFF)) {
-		// cart.write_cpu(addr, val);
+		cart.write_cpu(addr, val);
 		return;
 	}
 	// Invalid write operation or not yet implemented
